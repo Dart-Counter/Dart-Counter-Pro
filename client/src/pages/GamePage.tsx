@@ -67,7 +67,7 @@ const GamePage = () => {
   useEffect(() => {
     // Initialize a game if none exists and we have players
     if (!gameState && players.length > 0) {
-      startNewGame("501", players.slice(0, 2).map(p => p.id));
+      startNewGame("west-to-east", players.slice(0, 2).map(p => p.id));
     }
   }, [players]);
   
@@ -213,7 +213,7 @@ const GamePage = () => {
   return (
     <>
       <GameModeSelector 
-        selectedMode={gameState?.gameType || "501"} 
+        selectedMode={gameState?.gameType || "west-to-east"} 
         onModeSelect={handleGameModeSelect} 
       />
       
