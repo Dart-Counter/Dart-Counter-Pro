@@ -73,11 +73,11 @@ app.use((req, res, next) => {
   // Use environment port or default to 5000
   // this serves both the API and the client.
   const port = process.env.PORT || 5000;
+  const HOST = process.env.REPLIT_DEPLOYMENT ? "0.0.0.0" : "localhost";
   server.listen({
     port,
-    host: "0.0.0.0",
-    reusePort: true,
+    host: HOST,
   }, () => {
-    log(`serving on port ${port}`);
+    log(`serving on ${HOST}:${port}`);
   });
 })();
