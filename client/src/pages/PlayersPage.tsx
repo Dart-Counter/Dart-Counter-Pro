@@ -110,12 +110,8 @@ const PlayersPage = () => {
     }
   };
 
-  const handleSavePlayer = (playerData: InsertPlayer) => {
-    if (selectedPlayer) {
-      updatePlayerMutation.mutate({ id: selectedPlayer.id, data: playerData });
-    } else {
-      addPlayerMutation.mutate(playerData);
-    }
+  const handleSavePlayer = () => {
+    addPlayerMutation.mutate({});
   };
 
   return (

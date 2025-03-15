@@ -21,12 +21,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Player routes
   apiRouter.post("/players", async (req, res) => {
     try {
-      const playerData = insertPlayerSchema.parse(req.body);
+      const players = await storage.getPlayers();
+      const playerNumber = players.length + 1;
+      const playerData = { name: `Player-${playerNumber}` };
       const player = await storage.createPlayer(playerData);
       res.json(player);
     } catch (error) {
       console.error("Player creation error:", error);
-      handleZodError(error, res);
+      res.status(500).json({ message: "Failed to create player" });
     }
   });
 
