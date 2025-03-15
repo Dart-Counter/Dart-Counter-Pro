@@ -19,11 +19,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   };
 
   // Player routes
+  apiRouter.post("/players", async (req, res) => {
+    try {
+      const playerData = insertPlayerSchema.parse(req.body);
+      const player = await storage.createPlayer(playerData);
+      res.json(player);
+    } catch (error) {
+      console.error("Player creation error:", error);
+      handleZodError(error, res);
+    }
+  });
+
   apiRouter.get("/players", async (req, res) => {
     try {
       const players = await storage.getPlayers();
       res.json(players);
     } catch (error) {
+      console.error("Get players error:", error);
       res.status(500).json({ message: "Failed to fetch players" });
     }
   });

@@ -13,7 +13,7 @@ export interface IStorage {
   createPlayer(player: InsertPlayer): Promise<Player>;
   updatePlayer(id: number, data: Partial<Omit<Player, "id">>): Promise<Player | undefined>;
   deletePlayer(id: number): Promise<boolean>;
-  
+
   // Game operations
   getGames(): Promise<Game[]>;
   getGame(id: number): Promise<Game | undefined>;
@@ -22,7 +22,7 @@ export interface IStorage {
   deleteGame(id: number): Promise<boolean>;
   getRecentGames(limit: number): Promise<Game[]>;
   getPlayerGames(playerId: number): Promise<Game[]>;
-  
+
   // Score operations
   getScores(gameId: number): Promise<Score[]>;
   getPlayerScores(playerId: number): Promise<Score[]>;
@@ -58,23 +58,28 @@ export class MemStorage implements IStorage {
   }
 
   async createPlayer(player: InsertPlayer): Promise<Player> {
-    const id = this.playerId++;
-    const newPlayer: Player = {
-      id,
-      name: player.name,
-      gamesPlayed: 0,
-      wins: 0,
-      highestScore: 0,
-      created: new Date()
-    };
-    this.players.set(id, newPlayer);
-    return newPlayer;
+    try {
+      const id = this.playerId++;
+      const newPlayer: Player = {
+        id,
+        name: player.name,
+        gamesPlayed: 0,
+        wins: 0,
+        highestScore: 0,
+        created: new Date()
+      };
+      this.players.set(id, newPlayer);
+      return newPlayer;
+    } catch (error) {
+      console.error("Error creating player:", error);
+      throw new Error("Failed to create player");
+    }
   }
 
   async updatePlayer(id: number, data: Partial<Omit<Player, "id">>): Promise<Player | undefined> {
     const player = this.players.get(id);
     if (!player) return undefined;
-    
+
     const updatedPlayer = { ...player, ...data };
     this.players.set(id, updatedPlayer);
     return updatedPlayer;
@@ -104,7 +109,7 @@ export class MemStorage implements IStorage {
       completed: false
     };
     this.games.set(id, newGame);
-    
+
     // Update gamesPlayed for all players
     const playerIds = (newGame.playersData as PlayersData).map(p => p.playerId);
     for (const playerId of playerIds) {
@@ -115,17 +120,17 @@ export class MemStorage implements IStorage {
         });
       }
     }
-    
+
     return newGame;
   }
 
   async updateGame(id: number, data: Partial<Omit<Game, "id">>): Promise<Game | undefined> {
     const game = this.games.get(id);
     if (!game) return undefined;
-    
+
     const updatedGame = { ...game, ...data };
     this.games.set(id, updatedGame);
-    
+
     // If game is completed and has a winner, update player stats
     if (data.completed && data.winner) {
       const winnerPlayer = await this.getPlayer(data.winner);
@@ -135,7 +140,7 @@ export class MemStorage implements IStorage {
         });
       }
     }
-    
+
     return updatedGame;
   }
 
@@ -182,7 +187,7 @@ export class MemStorage implements IStorage {
       date: new Date()
     };
     this.scores.set(id, newScore);
-    
+
     // Update player's highest score if needed
     const player = await this.getPlayer(score.playerId);
     if (player && score.score > player.highestScore) {
@@ -190,7 +195,7 @@ export class MemStorage implements IStorage {
         highestScore: score.score
       });
     }
-    
+
     return newScore;
   }
 
@@ -201,7 +206,7 @@ export class MemStorage implements IStorage {
   async getHighScores(limit: number): Promise<{player: Player, score: Score}[]> {
     const allScores = Array.from(this.scores.values());
     const playerHighScores: Map<number, Score> = new Map();
-    
+
     // Find highest score for each player
     for (const score of allScores) {
       const currentHighest = playerHighScores.get(score.playerId);
@@ -209,7 +214,7 @@ export class MemStorage implements IStorage {
         playerHighScores.set(score.playerId, score);
       }
     }
-    
+
     // Create result array with player and score pairs
     const result: {player: Player, score: Score}[] = [];
     for (const [playerId, score] of playerHighScores) {
@@ -218,7 +223,7 @@ export class MemStorage implements IStorage {
         result.push({ player, score });
       }
     }
-    
+
     // Sort by score and limit
     return result
       .sort((a, b) => b.score.score - a.score.score)
