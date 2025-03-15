@@ -5,7 +5,15 @@ import { Button } from "@/components/ui/button";
 import { FadeIn } from "@/lib/animations";
 
 const PlayersPage = () => {
-  const [soloMode, setSoloMode] = useState(false);
+  const [soloMode, setSoloMode] = useState(() => {
+    const stored = localStorage.getItem('practiceMode');
+    return stored === 'true';
+  });
+
+  const handleModeChange = (newMode: boolean) => {
+    setSoloMode(newMode);
+    localStorage.setItem('practiceMode', String(newMode));
+  };
 
   const players = soloMode ? 
     [{ id: 1, name: "Practice Mode" }] : 
@@ -20,7 +28,7 @@ const PlayersPage = () => {
               <h2 className="font-['Orbitron'] text-primary text-2xl md:text-3xl">Game Mode</h2>
               <Button
                 className={`w-full md:w-auto ${soloMode ? 'bg-accent' : 'bg-primary'} hover:opacity-90 text-primary-foreground`}
-                onClick={() => setSoloMode(!soloMode)}
+                onClick={() => handleModeChange(!soloMode)}
               >
                 {soloMode ? "Switch to 2 Players" : "Switch to Practice Mode"}
               </Button>

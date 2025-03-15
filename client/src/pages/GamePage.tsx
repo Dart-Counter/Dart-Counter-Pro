@@ -109,8 +109,7 @@ const GamePage = () => {
 
   // Handle game mode selection
   const handleGameModeSelect = (mode: GameType) => {
-    // Get players based on practice mode
-    const practiceMode = players.length === 1 && players[0].name === "Practice Mode";
+    const isPracticeMode = localStorage.getItem('practiceMode') === 'true';
 
     if (players.length === 0) {
       toast({
@@ -121,7 +120,7 @@ const GamePage = () => {
       return;
     }
 
-    const playerIds = practiceMode ? [1] : players.slice(0, 2).map(p => p.id);
+    const playerIds = isPracticeMode ? [1] : [1, 2];
     startNewGame(mode, playerIds);
   };
 
