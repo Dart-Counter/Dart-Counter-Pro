@@ -76,6 +76,8 @@ export const PlayerDataSchema = z.object({
   currentScore: z.number(),
   position: z.number().optional(), // For sequence games
   throws: z.array(z.number()).optional(),
+  bust: z.boolean().optional(), // For X01 games when going below 0
+  invalidFinish: z.boolean().optional(), // For X01 games when not finishing on a double
 });
 
 export type PlayerData = z.infer<typeof PlayerDataSchema>;

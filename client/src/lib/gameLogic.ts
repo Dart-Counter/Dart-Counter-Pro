@@ -62,15 +62,30 @@ export const processX01Throw = (
   let newScore = player.currentScore - throwValue;
   let turnComplete = false;
   let isWinner = false;
+  let isBust = false;
+  let isInvalidFinish = false;
   
   // Add throw to tracking array
   const updatedThrows = [...(player.throws || []), throwValue];
   
-  // Check for bust (going below 0 or to exactly 1)
-  if (newScore < 0 || newScore === 1) {
+  // Check for bust (going below 0)
+  if (newScore < 0) {
+    isBust = true;
     newScore = player.currentScore; // Bust - revert score
     turnComplete = true;
   } 
+  // Check if trying to finish with 1 remaining (impossible)
+  else if (newScore === 1) {
+    isBust = true;
+    newScore = player.currentScore; // Bust - revert score
+    turnComplete = true;
+  }
+  // Check for invalid finish (not using a double or bullseye)
+  else if (newScore === 0 && !(throwScore.type === "double" || throwScore.type === "bullseye")) {
+    isInvalidFinish = true;
+    newScore = player.currentScore; // Invalid finish - revert score
+    turnComplete = true;
+  }
   // Check for win (exactly 0 with double or bullseye)
   else if (newScore === 0 && (throwScore.type === "double" || throwScore.type === "bullseye")) {
     isWinner = true;
@@ -86,7 +101,9 @@ export const processX01Throw = (
   updatedPlayers[currentPlayerIndex] = {
     ...player,
     currentScore: newScore,
-    throws: updatedThrows
+    throws: updatedThrows,
+    bust: isBust,
+    invalidFinish: isInvalidFinish
   };
   
   // Determine next state
