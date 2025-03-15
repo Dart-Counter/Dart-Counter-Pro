@@ -124,14 +124,14 @@ const PlayersPage = () => {
         <CardContent className="p-4">
           <div className="flex justify-between items-center mb-4">
             <h2 className="font-['Orbitron'] text-primary text-xl">Players</h2>
-            <Button 
+            <Button
               className="bg-primary hover:bg-primary/90 text-primary-foreground"
-              onClick={handleAddPlayer}
+              onClick={() => addPlayerMutation.mutate({})} //Simplified add player button
             >
               <Plus className="h-4 w-4 mr-1" /> Add Player
             </Button>
           </div>
-          
+
           {isLoading ? (
             <div className="text-center py-8">
               <p className="text-muted-foreground">Loading players...</p>
@@ -140,9 +140,9 @@ const PlayersPage = () => {
             <div className="text-center py-12">
               <h3 className="text-lg mb-2">No Players Yet</h3>
               <p className="text-muted-foreground mb-4">Add your first player to get started</p>
-              <Button 
+              <Button
                 className="bg-primary hover:bg-primary/90 text-primary-foreground"
-                onClick={handleAddPlayer}
+                onClick={() => addPlayerMutation.mutate({})} //Simplified add player button
               >
                 <Plus className="h-4 w-4 mr-1" /> Add Player
               </Button>
@@ -184,7 +184,7 @@ const PlayersPage = () => {
             <AlertDialogCancel className="bg-panel border border-primary text-foreground hover:bg-panel/90">
               Cancel
             </AlertDialogCancel>
-            <AlertDialogAction 
+            <AlertDialogAction
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               onClick={confirmDeletePlayer}
             >
