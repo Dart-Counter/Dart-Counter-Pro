@@ -19,7 +19,7 @@ const GamePage = () => {
   const [showWinCelebration, setShowWinCelebration] = useState(false);
   const [winnerName, setWinnerName] = useState("");
   const [recentHighScore, setRecentHighScore] = useState(false);
-  
+
   // Dart confirmation state
   const [pendingThrow, setPendingThrow] = useState<{
     throwType: ThrowType;
@@ -29,19 +29,19 @@ const GamePage = () => {
     isInvalidFinish: boolean;
     remainingScore?: number;
   } | null>(null);
-  
+
   const { toast } = useToast();
-  
+
   // Fetch players
   const { data: players = [] } = useQuery<Player[]>({
     queryKey: ["/api/players"],
   });
-  
+
   // Fetch recent games
   const { data: recentGames = [] } = useQuery({
     queryKey: ["/api/games/recent"],
   });
-  
+
   // Create new game mutation
   const createGameMutation = useMutation({
     mutationFn: async (gameData: { gameType: string; playersData: PlayersData }) => {
@@ -52,7 +52,7 @@ const GamePage = () => {
       queryClient.invalidateQueries({ queryKey: ["/api/games/recent"] });
     },
   });
-  
+
   // Update game mutation
   const updateGameMutation = useMutation({
     mutationFn: async (gameData: { id: number; data: Partial<GameState> }) => {
@@ -63,7 +63,7 @@ const GamePage = () => {
       queryClient.invalidateQueries({ queryKey: ["/api/games/recent"] });
     },
   });
-  
+
   // Create score mutation
   const createScoreMutation = useMutation({
     mutationFn: async (scoreData: { gameId: number; playerId: number; score: number; round: number }) => {
@@ -74,14 +74,14 @@ const GamePage = () => {
       queryClient.invalidateQueries({ queryKey: ["/api/scores/high"] });
     },
   });
-  
+
   useEffect(() => {
     // Initialize a game if none exists and we have players
     if (!gameState && players.length > 0) {
       startNewGame("west-to-east", players.slice(0, 2).map(p => p.id));
     }
   }, [players]);
-  
+
   // Initialize a new game
   const startNewGame = (gameType: GameType, playerIds: number[]) => {
     if (playerIds.length === 0) {
@@ -92,10 +92,10 @@ const GamePage = () => {
       });
       return;
     }
-    
+
     const newState = initializeGame(gameType, playerIds);
     setGameState(newState);
-    
+
     // Create game in the database
     createGameMutation.mutate({
       gameType: newState.gameType,
@@ -106,7 +106,7 @@ const GamePage = () => {
       }
     });
   };
-  
+
   // Handle game mode selection
   const handleGameModeSelect = (mode: GameType) => {
     if (players.length === 0) {
@@ -117,36 +117,36 @@ const GamePage = () => {
       });
       return;
     }
-    
-    // Use currently active players or default to first 2
-    const playerIds = gameState?.players.map(p => p.playerId) || players.slice(0, 2).map(p => p.id);
+
+    // Use practice mode or default players
+    const playerIds = players.map(p => p.id);
     startNewGame(mode, playerIds);
   };
-  
+
   // Pre-process throw for confirmation
   const handlePreProcessThrow = (throwType: ThrowType, value: number) => {
     if (!gameState) return;
-    
+
     const calculatedValue = calculateThrowScore(throwType, value);
     const player = gameState.players[gameState.currentPlayerIndex];
     const remainingScore = player.currentScore - calculatedValue;
-    
+
     // Check for bust conditions (X01 games)
     let isBust = false;
     let isInvalidFinish = false;
-    
+
     if (["501", "301", "101"].includes(gameState.gameType)) {
       // Going below 0 or exactly to 1 (impossible to finish) is a bust
       if (remainingScore < 0 || remainingScore === 1) {
         isBust = true;
       }
-      
+
       // Finishing without a double/bullseye is invalid
       if (remainingScore === 0 && !(throwType === "double" || throwType === "bullseye")) {
         isInvalidFinish = true;
       }
     }
-    
+
     // Set pending throw for confirmation
     setPendingThrow({
       throwType,
@@ -161,14 +161,14 @@ const GamePage = () => {
   // Handle dart throw confirmation
   const handleConfirmThrow = () => {
     if (!gameState || !pendingThrow) return;
-    
+
     const { throwType, value, calculatedValue } = pendingThrow;
     const currentPlayerId = gameState.players[gameState.currentPlayerIndex].playerId;
-    
+
     // Process the throw in the game state
     const newState = processThrow(gameState, throwType, value);
     setGameState(newState);
-    
+
     // Check if high score
     if (calculatedValue >= HIGH_SCORE_THRESHOLD) {
       setAchievementMessage({
@@ -179,7 +179,7 @@ const GamePage = () => {
       setRecentHighScore(true);
       setTimeout(() => setRecentHighScore(false), 3000);
     }
-    
+
     // Record the score
     if (gameState.id) {
       createScoreMutation.mutate({
@@ -189,14 +189,14 @@ const GamePage = () => {
         round: gameState.currentRound,
       });
     }
-    
+
     // Check for win condition
     if (newState.completed && newState.winner) {
       const winner = players.find(p => p.id === newState.winner);
       if (winner) {
         setWinnerName(winner.name);
         setShowWinCelebration(true);
-        
+
         // Update game in the database
         if (gameState.id) {
           updateGameMutation.mutate({
@@ -210,27 +210,27 @@ const GamePage = () => {
         }
       }
     }
-    
+
     // Clear pending throw
     setPendingThrow(null);
   };
-  
+
   // Cancel throw confirmation
   const handleCancelThrow = () => {
     setPendingThrow(null);
   };
-  
+
   // Handle score submission (legacy method, redirects to pre-process)
   const handleScoreSubmit = (throwType: ThrowType, value: number) => {
     handlePreProcessThrow(throwType, value);
   };
-  
+
   // Handle miss
   const handleMiss = () => {
     if (!gameState) return;
     handleScoreSubmit("miss", 0);
   };
-  
+
   // Handle undo
   const handleUndo = () => {
     // This would need access to previous state
@@ -239,7 +239,7 @@ const GamePage = () => {
       description: "This feature is coming soon",
     });
   };
-  
+
   // Restart current game
   const handleRestartGame = () => {
     if (!gameState) return;
@@ -247,19 +247,19 @@ const GamePage = () => {
     const playerIds = gameState.players.map(p => p.playerId);
     startNewGame(gameType, playerIds);
   };
-  
+
   // Start a new game (different from current)
   const handleNewGame = () => {
     // For now, same as restart but could show a dialog
     if (!gameState) return;
     handleRestartGame();
   };
-  
+
   // Close achievement notification
   const handleCloseAchievement = () => {
     setShowAchievement(false);
   };
-  
+
   if (players.length === 0) {
     return (
       <div className="text-center py-12">
@@ -268,14 +268,14 @@ const GamePage = () => {
       </div>
     );
   }
-  
+
   return (
     <div className="flex flex-col gap-6 pb-16">
       <GameModeSelector 
         selectedMode={gameState?.gameType || "west-to-east"} 
         onModeSelect={handleGameModeSelect} 
       />
-      
+
       {gameState && (
         <div className="flex flex-col gap-6 overflow-visible">
           <Scoreboard 
@@ -285,7 +285,7 @@ const GamePage = () => {
             onNewGame={handleNewGame}
             recentHighScore={recentHighScore}
           />
-          
+
           <ScoreInput 
             gameState={gameState}
             players={players}
@@ -295,7 +295,7 @@ const GamePage = () => {
           />
         </div>
       )}
-      
+
       {/* Achievement notification */}
       <Achievement 
         title={achievementMessage.title}
@@ -303,13 +303,13 @@ const GamePage = () => {
         isVisible={showAchievement}
         onClose={handleCloseAchievement}
       />
-      
+
       {/* Win celebration */}
       <WinCelebration 
         isVisible={showWinCelebration}
         playerName={winnerName}
       />
-      
+
       {/* Dart throw confirmation */}
       {pendingThrow && (
         <DartConfirmation

@@ -21,10 +21,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Default players route
   apiRouter.get("/players", async (req, res) => {
     const soloMode = req.query.solo === 'true';
-    const defaultPlayers = soloMode ? 
-      [{ id: 1, name: "Practice Mode" }] : 
-      [{ id: 1, name: "Player 1" }, { id: 2, name: "Player 2" }];
-    res.json(defaultPlayers);
+    if (soloMode) {
+      res.json([{ id: 1, name: "Practice Mode" }]);
+    } else {
+      res.json([{ id: 1, name: "Player 1" }, { id: 2, name: "Player 2" }]);
+    }
   });
 
   // Game routes
