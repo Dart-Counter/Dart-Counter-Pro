@@ -67,7 +67,7 @@ function App() {
           onOpenDataPrivacy={() => openModal('dataPrivacy')}
         />
         
-        <main className="flex-grow p-4 md:p-6">
+        <main className="flex-grow p-4 md:p-6 overflow-x-hidden">
           <Router />
         </main>
         

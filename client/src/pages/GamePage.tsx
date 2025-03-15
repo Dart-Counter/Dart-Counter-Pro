@@ -211,14 +211,14 @@ const GamePage = () => {
   }
   
   return (
-    <>
+    <div className="flex flex-col gap-6 pb-16">
       <GameModeSelector 
         selectedMode={gameState?.gameType || "west-to-east"} 
         onModeSelect={handleGameModeSelect} 
       />
       
       {gameState && (
-        <>
+        <div className="flex flex-col gap-6 overflow-visible">
           <Scoreboard 
             gameState={gameState}
             players={players}
@@ -234,7 +234,7 @@ const GamePage = () => {
             onMiss={handleMiss}
             onUndo={handleUndo}
           />
-        </>
+        </div>
       )}
       
       {/* Achievement notification */}
@@ -250,7 +250,7 @@ const GamePage = () => {
         isVisible={showWinCelebration}
         playerName={winnerName}
       />
-    </>
+    </div>
   );
 };
 

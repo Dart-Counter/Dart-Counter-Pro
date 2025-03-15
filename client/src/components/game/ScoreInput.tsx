@@ -68,12 +68,12 @@ const ScoreInput = ({
           </p>
         )}
         
-        <div className="grid grid-cols-3 gap-4 mb-4">
+        <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-4">
           {SEGMENT_TYPES.map((segment, index) => (
             <SlideIn key={segment.type} delay={index * 0.1} direction="up">
               <Button
                 variant={selectedSegment === segment.type ? "default" : "outline"}
-                className={`w-full h-16 flex flex-col items-center justify-center ${
+                className={`w-full h-14 sm:h-16 flex flex-col items-center justify-center ${
                   selectedSegment === segment.type 
                     ? "bg-primary text-primary-foreground"
                     : "border-primary hover:bg-primary hover:text-primary-foreground"
@@ -89,12 +89,13 @@ const ScoreInput = ({
           ))}
         </div>
         
-        <div className="grid grid-cols-5 md:grid-cols-10 gap-2 mb-4">
+        <div className="grid grid-cols-5 md:grid-cols-10 gap-1 sm:gap-2 mb-3">
           {DART_NUMBERS.slice(0, 10).map(num => (
             <Button
               key={num}
               variant="outline"
-              className={`h-12 font-mono border-primary hover:bg-primary hover:text-primary-foreground ${
+              size="sm"
+              className={`h-10 sm:h-12 font-mono border-primary hover:bg-primary hover:text-primary-foreground ${
                 selectedNumber === num 
                   ? "bg-primary text-primary-foreground"
                   : ""
@@ -106,12 +107,13 @@ const ScoreInput = ({
           ))}
         </div>
         
-        <div className="grid grid-cols-5 md:grid-cols-10 gap-2 mb-4">
+        <div className="grid grid-cols-5 md:grid-cols-10 gap-1 sm:gap-2 mb-4">
           {DART_NUMBERS.slice(10, 20).map(num => (
             <Button
               key={num}
               variant="outline"
-              className={`h-12 font-mono border-primary hover:bg-primary hover:text-primary-foreground ${
+              size="sm"
+              className={`h-10 sm:h-12 font-mono border-primary hover:bg-primary hover:text-primary-foreground ${
                 selectedNumber === num 
                   ? "bg-primary text-primary-foreground"
                   : ""
@@ -123,12 +125,12 @@ const ScoreInput = ({
           ))}
         </div>
         
-        <div className="grid grid-cols-2 gap-4 mb-6">
+        <div className="grid grid-cols-2 gap-2 sm:gap-4 mb-5">
           {SPECIAL_SEGMENTS.map((segment, index) => (
             <SlideIn key={segment.type} delay={index * 0.1} direction="up">
               <Button
                 variant="outline"
-                className="w-full h-16 flex flex-col items-center justify-center border-primary hover:bg-primary hover:text-primary-foreground"
+                className="w-full h-14 sm:h-16 flex flex-col items-center justify-center border-primary hover:bg-primary hover:text-primary-foreground"
                 onClick={() => handleSpecialSegmentSelect(segment.type as ThrowType, segment.value)}
               >
                 <span className="text-xs block opacity-80">{segment.label}</span>
@@ -138,7 +140,7 @@ const ScoreInput = ({
           ))}
         </div>
         
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-2 sm:gap-4">
           <Button
             variant="destructive"
             className="bg-destructive/20 hover:bg-destructive/40 text-destructive border border-destructive"

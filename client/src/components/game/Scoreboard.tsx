@@ -75,15 +75,16 @@ const Scoreboard = ({
   };
 
   return (
-    <Card className="bg-panel border-2 border-primary mb-6">
-      <CardContent className="p-4">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="font-['Orbitron'] text-primary text-xl">
+    <Card className="bg-panel border-2 border-primary">
+      <CardContent className="p-3 sm:p-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
+          <h2 className="font-['Orbitron'] text-primary text-lg sm:text-xl">
             Active Game: <span className="text-foreground">{gameState.gameType}</span>
           </h2>
           <div className="flex space-x-2">
             <Button 
               variant="outline" 
+              size="sm"
               className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
               onClick={onRestartGame}
             >
@@ -91,6 +92,7 @@ const Scoreboard = ({
             </Button>
             <Button 
               variant="outline" 
+              size="sm"
               className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
               onClick={onNewGame}
             >
@@ -99,15 +101,15 @@ const Scoreboard = ({
           </div>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-center">
+        <div className="overflow-x-auto -mx-2 px-2">
+          <table className="w-full text-center text-sm sm:text-base">
             <thead>
               <tr className="border-b border-primary">
-                <th className="p-2 text-primary">Player</th>
-                <th className="p-2 text-primary">Score</th>
-                <th className="p-2 text-primary">Last 3 Throws</th>
-                <th className="p-2 text-primary">Average</th>
-                <th className="p-2 text-primary">Actions</th>
+                <th className="p-1 sm:p-2 text-primary">Player</th>
+                <th className="p-1 sm:p-2 text-primary">Score</th>
+                <th className="p-1 sm:p-2 text-primary">Last 3</th>
+                <th className="p-1 sm:p-2 text-primary">Avg</th>
+                <th className="p-1 sm:p-2 text-primary">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -123,42 +125,42 @@ const Scoreboard = ({
                       isActive ? "bg-primary bg-opacity-5" : ""
                     }`}
                   >
-                    <td className="p-2">
+                    <td className="p-1 sm:p-2">
                       <div className="flex items-center justify-center">
-                        <div className="h-8 w-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center mr-2">
+                        <div className="h-6 w-6 sm:h-8 sm:w-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center mr-1 sm:mr-2 text-xs sm:text-sm">
                           {getPlayerInitial(playerId)}
                         </div>
                         <span>{getPlayerName(playerId)}</span>
                       </div>
                     </td>
-                    <td className="p-2">
+                    <td className="p-1 sm:p-2">
                       <HighlightScore 
                         score={getPlayerScoreDisplay(gameState, index)}
                         animate={animateIndex === index}
                       />
                     </td>
-                    <td className="p-2">
-                      <div className="flex justify-center space-x-2">
+                    <td className="p-1 sm:p-2">
+                      <div className="flex justify-center space-x-1 sm:space-x-2">
                         {lastThrows.map((throwVal, idx) => (
                           <span 
                             key={idx} 
-                            className="inline-block w-10 h-10 rounded-full bg-panel border border-muted-foreground flex items-center justify-center"
+                            className="inline-block w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-panel border border-muted-foreground flex items-center justify-center text-xs sm:text-sm"
                           >
                             {throwVal}
                           </span>
                         ))}
                       </div>
                     </td>
-                    <td className="p-2">
+                    <td className="p-1 sm:p-2">
                       <span>{calculateAverage(playerId)}</span>
                     </td>
-                    <td className="p-2">
+                    <td className="p-1 sm:p-2">
                       <Button 
                         variant="ghost" 
-                        className="text-destructive hover:text-destructive/80"
+                        className="text-destructive hover:text-destructive/80 h-7 w-7 p-0"
                         size="sm"
                       >
-                        <RefreshCw className="h-4 w-4" />
+                        <RefreshCw className="h-3 w-3 sm:h-4 sm:w-4" />
                       </Button>
                     </td>
                   </tr>
