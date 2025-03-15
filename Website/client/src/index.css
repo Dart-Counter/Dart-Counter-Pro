@@ -1,0 +1,120 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 7%;
+    --foreground: 0 0% 98%;
+    
+    --card: 0 0% 12%;
+    --card-foreground: 0 0% 98%;
+    
+    --popover: 0 0% 12%;
+    --popover-foreground: 0 0% 98%;
+    
+    --primary: 186 100% 50%;
+    --primary-foreground: 0 0% 0%;
+    
+    --secondary: 0 0% 12%;
+    --secondary-foreground: 186 100% 50%;
+    
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 70%;
+    
+    --accent: 186 100% 50%;
+    --accent-foreground: 0 0% 0%;
+    
+    --destructive: 0 85% 60%;
+    --destructive-foreground: 0 0% 98%;
+    
+    --border: 186 100% 50%;
+    --input: 186 100% 50%;
+    --ring: 186 100% 50%;
+    
+    --radius: 0.5rem;
+    
+    --chart-1: 186 100% 50%;
+    --chart-2: 215 100% 50%;
+    --chart-3: 155 100% 50%;
+    --chart-4: 45 100% 50%;
+    --chart-5: 325 100% 50%;
+    
+    --sidebar-background: 0 0% 14%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-primary: 186 100% 50%;
+    --sidebar-primary-foreground: 0 0% 0%;
+    --sidebar-accent: 186 100% 50%;
+    --sidebar-accent-foreground: 0 0% 0%;
+    --sidebar-border: 186 100% 50%;
+    --sidebar-ring: 186 100% 50%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+  
+  /* Font styles for special elements */
+  .font-orbitron {
+    font-family: 'Orbitron', sans-serif;
+  }
+  
+  .font-inter {
+    font-family: 'Inter', sans-serif;
+  }
+  
+  .font-mono {
+    font-family: 'Roboto Mono', monospace;
+  }
+}
+
+@layer components {
+  /* Panel styles */
+  .panel {
+    @apply bg-card border-2 border-primary rounded-lg;
+  }
+  
+  /* Button animations */
+  .btn-pulse {
+    animation: pulse-cyan 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  
+  @keyframes pulse-cyan {
+    0%, 100% {
+      box-shadow: 0 0 0 0 rgba(0, 229, 255, 0.4);
+    }
+    50% {
+      box-shadow: 0 0 0 8px rgba(0, 229, 255, 0);
+    }
+  }
+  
+  /* Customize scrollbars */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-muted rounded-full;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-primary/40 rounded-full hover:bg-primary/60 transition-colors;
+  }
+  
+  /* Add some bottom padding to content areas */
+  .game-content {
+    padding-bottom: env(safe-area-inset-bottom, 2rem);
+  }
+  
+  /* Prevent overlapping on mobile */
+  @media (max-width: 640px) {
+    .mobile-spacing {
+      margin-bottom: 1rem;
+    }
+  }
+}
