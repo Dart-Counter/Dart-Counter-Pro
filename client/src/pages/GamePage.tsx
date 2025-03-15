@@ -5,9 +5,10 @@ import { useToast } from "@/hooks/use-toast";
 import GameModeSelector from "@/components/game/GameModeSelector";
 import Scoreboard from "@/components/game/Scoreboard";
 import ScoreInput from "@/components/game/ScoreInput";
+import DartConfirmation from "@/components/game/DartConfirmation";
 import Achievement from "@/components/ui/achievement";
 import { WinCelebration } from "@/lib/animations";
-import { GameState, Player, ThrowType, GameType, PlayersData } from "@/types";
+import { GameState, Player, ThrowType, GameType, PlayersData, ThrowScore } from "@/types";
 import { initializeGame, processThrow, calculateThrowScore } from "@/lib/gameLogic";
 import { GAME_MODES, HIGH_SCORE_THRESHOLD } from "@/constants";
 
@@ -18,6 +19,16 @@ const GamePage = () => {
   const [showWinCelebration, setShowWinCelebration] = useState(false);
   const [winnerName, setWinnerName] = useState("");
   const [recentHighScore, setRecentHighScore] = useState(false);
+  
+  // Dart confirmation state
+  const [pendingThrow, setPendingThrow] = useState<{
+    throwType: ThrowType;
+    value: number;
+    calculatedValue: number;
+    isBust: boolean;
+    isInvalidFinish: boolean;
+    remainingScore?: number;
+  } | null>(null);
   
   const { toast } = useToast();
   
@@ -112,11 +123,46 @@ const GamePage = () => {
     startNewGame(mode, playerIds);
   };
   
-  // Handle score submission
-  const handleScoreSubmit = (throwType: ThrowType, value: number) => {
+  // Pre-process throw for confirmation
+  const handlePreProcessThrow = (throwType: ThrowType, value: number) => {
     if (!gameState) return;
     
-    const scoreValue = calculateThrowScore(throwType, value);
+    const calculatedValue = calculateThrowScore(throwType, value);
+    const player = gameState.players[gameState.currentPlayerIndex];
+    const remainingScore = player.currentScore - calculatedValue;
+    
+    // Check for bust conditions (X01 games)
+    let isBust = false;
+    let isInvalidFinish = false;
+    
+    if (["501", "301", "101"].includes(gameState.gameType)) {
+      // Going below 0 or exactly to 1 (impossible to finish) is a bust
+      if (remainingScore < 0 || remainingScore === 1) {
+        isBust = true;
+      }
+      
+      // Finishing without a double/bullseye is invalid
+      if (remainingScore === 0 && !(throwType === "double" || throwType === "bullseye")) {
+        isInvalidFinish = true;
+      }
+    }
+    
+    // Set pending throw for confirmation
+    setPendingThrow({
+      throwType,
+      value,
+      calculatedValue,
+      isBust,
+      isInvalidFinish,
+      remainingScore
+    });
+  };
+
+  // Handle dart throw confirmation
+  const handleConfirmThrow = () => {
+    if (!gameState || !pendingThrow) return;
+    
+    const { throwType, value, calculatedValue } = pendingThrow;
     const currentPlayerId = gameState.players[gameState.currentPlayerIndex].playerId;
     
     // Process the throw in the game state
@@ -124,10 +170,10 @@ const GamePage = () => {
     setGameState(newState);
     
     // Check if high score
-    if (scoreValue >= HIGH_SCORE_THRESHOLD) {
+    if (calculatedValue >= HIGH_SCORE_THRESHOLD) {
       setAchievementMessage({
         title: "High Score!",
-        message: `You hit ${scoreValue}! Impressive!`
+        message: `You hit ${calculatedValue}! Impressive!`
       });
       setShowAchievement(true);
       setRecentHighScore(true);
@@ -139,7 +185,7 @@ const GamePage = () => {
       createScoreMutation.mutate({
         gameId: gameState.id,
         playerId: currentPlayerId,
-        score: scoreValue,
+        score: calculatedValue,
         round: gameState.currentRound,
       });
     }
@@ -164,6 +210,19 @@ const GamePage = () => {
         }
       }
     }
+    
+    // Clear pending throw
+    setPendingThrow(null);
+  };
+  
+  // Cancel throw confirmation
+  const handleCancelThrow = () => {
+    setPendingThrow(null);
+  };
+  
+  // Handle score submission (legacy method, redirects to pre-process)
+  const handleScoreSubmit = (throwType: ThrowType, value: number) => {
+    handlePreProcessThrow(throwType, value);
   };
   
   // Handle miss
@@ -250,6 +309,20 @@ const GamePage = () => {
         isVisible={showWinCelebration}
         playerName={winnerName}
       />
+      
+      {/* Dart throw confirmation */}
+      {pendingThrow && (
+        <DartConfirmation
+          throwType={pendingThrow.throwType}
+          value={pendingThrow.value}
+          calculatedValue={pendingThrow.calculatedValue}
+          onConfirm={handleConfirmThrow}
+          onCancel={handleCancelThrow}
+          isBust={pendingThrow.isBust}
+          isInvalidFinish={pendingThrow.isInvalidFinish}
+          remainingScore={pendingThrow.remainingScore}
+        />
+      )}
     </div>
   );
 };
