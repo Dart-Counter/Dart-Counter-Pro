@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,28 +13,35 @@ const PlayersPage = () => {
 
   return (
     <FadeIn>
-      <Card className="bg-panel border-2 border-primary mb-6">
-        <CardContent className="p-4">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="font-['Orbitron'] text-primary text-xl">Game Mode</h2>
-            <Button
-              className={`bg-${soloMode ? 'accent' : 'primary'} hover:bg-${soloMode ? 'accent' : 'primary'}/90 text-primary-foreground`}
-              onClick={() => setSoloMode(!soloMode)}
-            >
-              {soloMode ? "Switch to 2 Players" : "Switch to Practice Mode"}
-            </Button>
-          </div>
+      <div className="max-w-4xl mx-auto px-4 py-6">
+        <Card className="bg-panel border-2 border-primary mb-6">
+          <CardContent className="p-4 md:p-6 lg:p-8">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+              <h2 className="font-['Orbitron'] text-primary text-2xl md:text-3xl">Game Mode</h2>
+              <Button
+                className={`w-full md:w-auto ${soloMode ? 'bg-accent' : 'bg-primary'} hover:opacity-90 text-primary-foreground`}
+                onClick={() => setSoloMode(!soloMode)}
+              >
+                {soloMode ? "Switch to 2 Players" : "Switch to Practice Mode"}
+              </Button>
+            </div>
 
-          <div className="mt-4">
-            <h3 className="text-lg mb-2">Current Players:</h3>
-            {players.map(player => (
-              <div key={player.id} className="text-primary-foreground mb-2">
-                {player.name}
+            <div className="mt-6">
+              <h3 className="text-lg font-semibold mb-4">Current Players:</h3>
+              <div className="space-y-3">
+                {players.map(player => (
+                  <div 
+                    key={player.id} 
+                    className="text-primary-foreground p-4 bg-background/50 rounded-lg border border-primary/20"
+                  >
+                    {player.name}
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </FadeIn>
   );
 };

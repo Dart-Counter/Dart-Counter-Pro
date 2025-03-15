@@ -109,17 +109,19 @@ const GamePage = () => {
 
   // Handle game mode selection
   const handleGameModeSelect = (mode: GameType) => {
+    // Get players based on practice mode
+    const practiceMode = players.length === 1 && players[0].name === "Practice Mode";
+
     if (players.length === 0) {
       toast({
         title: "Cannot start game",
-        description: "Please add at least one player first",
+        description: "Please select players or practice mode first",
         variant: "destructive",
       });
       return;
     }
 
-    // Use practice mode or default players
-    const playerIds = players.map(p => p.id);
+    const playerIds = practiceMode ? [1] : players.slice(0, 2).map(p => p.id);
     startNewGame(mode, playerIds);
   };
 
