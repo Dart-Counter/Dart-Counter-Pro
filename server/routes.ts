@@ -18,77 +18,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     return res.status(500).json({ message: "Internal server error" });
   };
 
-  // Player routes
-  apiRouter.post("/players", async (req, res) => {
-    try {
-      const players = await storage.getPlayers();
-      const playerNumber = players.length + 1;
-      const playerData = { name: `Player-${playerNumber}` };
-      const player = await storage.createPlayer(playerData);
-      res.json(player);
-    } catch (error) {
-      console.error("Player creation error:", error);
-      res.status(500).json({ message: "Failed to create player" });
-    }
-  });
-
+  // Default players route
   apiRouter.get("/players", async (req, res) => {
-    try {
-      const players = await storage.getPlayers();
-      res.json(players);
-    } catch (error) {
-      console.error("Get players error:", error);
-      res.status(500).json({ message: "Failed to fetch players" });
-    }
-  });
-
-  apiRouter.get("/players/:id", async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      const player = await storage.getPlayer(id);
-      if (!player) {
-        return res.status(404).json({ message: "Player not found" });
-      }
-      res.json(player);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to fetch player" });
-    }
-  });
-
-  apiRouter.post("/players", async (req, res) => {
-    try {
-      const data = insertPlayerSchema.parse(req.body);
-      const player = await storage.createPlayer(data);
-      res.status(201).json(player);
-    } catch (error) {
-      handleZodError(error, res);
-    }
-  });
-
-  apiRouter.put("/players/:id", async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      const updatedPlayer = await storage.updatePlayer(id, req.body);
-      if (!updatedPlayer) {
-        return res.status(404).json({ message: "Player not found" });
-      }
-      res.json(updatedPlayer);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to update player" });
-    }
-  });
-
-  apiRouter.delete("/players/:id", async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      const result = await storage.deletePlayer(id);
-      if (!result) {
-        return res.status(404).json({ message: "Player not found" });
-      }
-      res.status(204).send();
-    } catch (error) {
-      res.status(500).json({ message: "Failed to delete player" });
-    }
+    const soloMode = req.query.solo === 'true';
+    const defaultPlayers = soloMode ? 
+      [{ id: 1, name: "Practice Mode" }] : 
+      [{ id: 1, name: "Player 1" }, { id: 2, name: "Player 2" }];
+    res.json(defaultPlayers);
   });
 
   // Game routes
